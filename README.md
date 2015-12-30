@@ -1,26 +1,27 @@
-docker-mapserver 7
-===================
+docker-geomoose 
+===============
 
-The purpose of this project is to provide a WMS server using mapserver 7 (github master)
+This will create a GeoMOOSE docker image based on Ubuntu/Trusty with:
 
-## Mapserver
+* MapServer (GitHub Master)
+* Apache
+* PHP 5 
+* GeoMOOSE (GitHub Master)
 
-MapServer is an Open Source platform for publishing spatial data and interactive mapping applications to the web. Originally developed in the mid-1990’s at the University of Minnesota, MapServer is released under an MIT-style license, and runs on all major platforms (Windows, Linux, Mac OS X). MapServer is not a full-featured GIS system, nor does it aspire to be.
-
-## Building docker-mapserver
+## Building docker-geomoose
 
 Running this will build a docker image with mapserver 7
 
-    git clone https://github.com/srounet/docker-mapserver
-    cd docker-mapserver
-    docker build -t mapserver .
+    git clone https://github.com/geomoose/docker-geomoose
+    cd docker-geomoose
+    docker build -t geomoose .
 
 
-## Running docker-mapserver
+## Running docker-geomoose
 
 This image expose three ports 22 for ssh and 80 for Mapserver
 
-    sudo docker run -d -P -v /usr/local/mapserver:/maps --name mapserver mapserver
+    sudo docker run -d -P -v /usr/local/mapserver:/maps --name geomoose geomoose
 
 ## Image active users
 
