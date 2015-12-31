@@ -36,6 +36,39 @@ RUN cd /tmp && wget http://www.freedesktop.org/software/harfbuzz/release/harfbuz
     make install && \
     ldconfig
 
+# Apache 2
+RUN apt-get update && apt-get install -y apache2 apache2-threaded-dev curl
+
+# Configure localhost in Apache
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+COPY etc/000-default.conf /etc/apache2/sites-available/
+
+# Install the Apache Worker MPM (Multi-Procesing Modules)
+RUN sudo apt-get install apache2-mpm-worker
+
+# To reconcile this, the multiverse repository must be added to the apt sources.
+RUN echo 'deb http://archive.ubuntu.com/ubuntu trusty multiverse' >> /etc/apt/sources.list
+RUN echo 'deb http://archive.ubuntu.com/ubuntu trusty-updates multiverse' >> /etc/apt/sources.list
+RUN echo 'deb http://security.ubuntu.com/ubuntu trusty-security multiverse' >> /etc/apt/sources.list
+RUN sudo apt-get update
+
+# Install PHP5 and necessary modules
+RUN sudo apt-get install -y libapache2-mod-fastcgi php5-fpm libapache2-mod-php5 php5-common php5-cli php5-fpm php5 php5-dev
+
+# Enable these Apache modules
+RUN sudo a2enmod actions cgi alias
+
+# Apache configuration for PHP-FPM
+COPY etc/php5-fpm.conf /etc/apache2/conf-available/
+
+# Install supervisor
+RUN apt-get install -y supervisor
+RUN mkdir -p /var/log/supervisor
+COPY etc/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Create the following PHP file in the document root /var/www
+RUN echo '<?php phpinfo();' > /var/www/html/info.php
+
 # Install Mapserver itself
 RUN git clone https://github.com/mapserver/mapserver/ /usr/local/src/mapserver
 
@@ -66,48 +99,26 @@ RUN mkdir /usr/local/src/mapserver/build && \
         -DWITH_GIF=1 \
         -DWITH_EXEMPI=1 \
         -DWITH_XMLMAPFILE=1 \
+	-DWITH_PHP=1 \
     -DWITH_FCGI=0 && \
     make && \
     make install && \
     ldconfig
 
-# Apache 2
-RUN apt-get update && apt-get install -y apache2 apache2-threaded-dev curl
+# Install MapScript / PHP
+RUN echo 'extension=php_mapscript.so' > /etc/php5/mods-available/mapscript.ini
+RUN sudo ln -s /etc/php5/mods-available/mapscript.ini /etc/php5/apache2/conf.d/30-mapscript.ini
 
-# Configure localhost in Apache
-RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
-COPY etc/000-default.conf /etc/apache2/sites-available/
 
-# Install the Apache Worker MPM (Multi-Procesing Modules)
-RUN sudo apt-get install apache2-mpm-worker
+# Install GeoMOOSE
 
-# To reconcile this, the multiverse repository must be added to the apt sources.
-RUN echo 'deb http://archive.ubuntu.com/ubuntu trusty multiverse' >> /etc/apt/sources.list
-RUN echo 'deb http://archive.ubuntu.com/ubuntu trusty-updates multiverse' >> /etc/apt/sources.list
-RUN echo 'deb http://security.ubuntu.com/ubuntu trusty-security multiverse' >> /etc/apt/sources.list
-RUN sudo apt-get update
-
-# Install PHP5 and necessary modules
-RUN sudo apt-get install -y libapache2-mod-fastcgi php5-fpm libapache2-mod-php5 php5-common php5-cli php5-fpm php5
-
-# Enable these Apache modules
-RUN sudo a2enmod actions cgi alias
-
-# Apache configuration for PHP-FPM
-COPY etc/php5-fpm.conf /etc/apache2/conf-available/
-
-# Install supervisor
-RUN apt-get install -y supervisor
-RUN mkdir -p /var/log/supervisor
-COPY etc/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
-# Create the following PHP file in the document root /var/www
-RUN echo '<?php phpinfo();' > /var/www/html/info.php
 
 # Link to cgi-bin executable
 RUN chmod o+x /usr/local/bin/mapserv
 RUN ln -s /usr/local/bin/mapserv /usr/lib/cgi-bin/mapserv
 RUN chmod 755 /usr/lib/cgi-bin
+
+RUN sudo service apache2 restart
 
 # SSH config
 RUN mkdir /var/run/sshd
