@@ -110,15 +110,21 @@ RUN echo 'extension=php_mapscript.so' > /etc/php5/mods-available/mapscript.ini
 RUN sudo ln -s /etc/php5/mods-available/mapscript.ini /etc/php5/apache2/conf.d/30-mapscript.ini
 
 
-# Install GeoMOOSE
-
-
 # Link to cgi-bin executable
 RUN chmod o+x /usr/local/bin/mapserv
 RUN ln -s /usr/local/bin/mapserv /usr/lib/cgi-bin/mapserv
 RUN chmod 755 /usr/lib/cgi-bin
 
+
+# Install GeoMOOSE
+RUN git clone --recursive https://github.com/geomoose/geomoose.git /usr/local/geomoose
+
+# Intall the local settings
+COPY etc/local_settings.ini /usr/local/geomoose/conf
+
+# Restart Apache
 RUN sudo service apache2 restart
+
 
 # SSH config
 RUN mkdir /var/run/sshd

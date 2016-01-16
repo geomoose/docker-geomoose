@@ -1,6 +1,12 @@
 docker-geomoose 
 ===============
 
+## Credits
+
+Fork of : https://github.com/srounet/docker-mapserver
+
+## What is this?
+
 This will create a GeoMOOSE docker image based on Ubuntu/Trusty with:
 
 * MapServer (GitHub Master)
