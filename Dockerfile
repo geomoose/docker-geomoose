@@ -53,7 +53,7 @@ RUN echo 'deb http://security.ubuntu.com/ubuntu trusty-security multiverse' >> /
 RUN sudo apt-get update
 
 # Install PHP5 and necessary modules
-RUN sudo apt-get install -y libapache2-mod-fastcgi php5-fpm libapache2-mod-php5 php5-common php5-cli php5-fpm php5 php5-dev
+RUN sudo apt-get install -y libapache2-mod-fastcgi php5-fpm libapache2-mod-php5 php5-common php5-cli php5-fpm php5 php5-dev php5-gd php5-curl
 
 # Enable these Apache modules
 RUN sudo a2enmod actions cgi alias
