@@ -1,6 +1,6 @@
-# Mapserver for Docker
+# GeoMoose for Docker
 FROM ubuntu:trusty
-MAINTAINER Fabien Reboia<srounet@gmail.com>
+MAINTAINER Dan "Ducky" Little <@theduckylittle>
 
 ENV LANG C.UTF-8
 RUN update-locale LANG=C.UTF-8
@@ -115,6 +115,36 @@ RUN chmod o+x /usr/local/bin/mapserv
 RUN ln -s /usr/local/bin/mapserv /usr/lib/cgi-bin/mapserv
 RUN chmod 755 /usr/lib/cgi-bin
 
+# Install TinyOWS
+
+## First install postgresql and postgis
+
+RUN apt-get install -y autoconf build-essential cmake docbook-mathml docbook-xsl libboost-dev libboost-filesystem-dev libboost-timer-dev libcgal-dev libcunit1-dev libgdal-dev libgeos++-dev libgeotiff-dev libgmp-dev libjson0-dev libjson-c-dev liblas-dev libmpfr-dev libopenscenegraph-dev libpq-dev libproj-dev libxml2-dev postgresql xsltproc wget flex libfcgi-dev postgis postgresql-9.3-postgis-2.1
+
+
+# Compile TinyOWS
+RUN git clone https://github.com/mapserver/tinyows.git
+RUN cd tinyows && autoconf && ./configure && make && make install && cp tinyows /usr/lib/cgi-bin/tinyows
+# get rid of tinyows leftovers
+RUN rm -rf tinyows
+#--with-shp2pgsql=/usr/lib/postgresql/9.5/bin/shp2pgsql 
+
+COPY etc/tinyows.xml /etc/tinyows.xml
+
+# End of TinyOWS Install
+
+# Get the database going
+
+# create a landing place for the places data
+RUN mkdir -p /data/places
+RUN chmod a+rx /data
+RUN chmod a+rwx /data/places
+COPY data/places/* /data/places/
+
+# now create a database and load the data into it.
+COPY createdb.sh /tmp
+RUN chmod +x /tmp/createdb.sh
+RUN sudo service postgresql start ; su - postgres -c "/tmp/createdb.sh"
 
 # Install GeoMOOSE
 RUN git clone --recursive https://github.com/geomoose/geomoose.git /usr/local/geomoose

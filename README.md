@@ -13,6 +13,9 @@ This will create a GeoMOOSE docker image based on Ubuntu/Trusty with:
 * Apache 2.6
 * PHP 5 
 * GeoMOOSE (GitHub Master)
+* PostgreSQL 9.3
+* PostGIS 2.1
+* TinyOWS (GitHub Master)
 
 ## Building docker-geomoose
 
@@ -58,4 +61,9 @@ This will start the image in the 'foreground' and map the local GeoMOOSE directo
 ## Image active users
 
 The root password is `toor`.
+
+## Data Sources
+
+* U.S. Census TIGER Shapefiles are provided for places in the state of Minnesota.  For more information see [here](https://www.census.gov/geo/maps-data/data/tiger-line.html).  The files included here were downloaded on 10 May 2016 from [this url](ftp://ftp2.census.gov/geo/tiger/TIGER2015/PLACE/tl_2015_27_place.zip).
+
 

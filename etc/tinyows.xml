@@ -1,0 +1,20 @@
+<tinyows online_resource="http://localhost/mapserver/cgi-bin/tinyows"
+         schema_dir="/usr/local/tinyows/schema/"
+         check_schema="0"
+         log="/tmp/tinyows.log"
+         log_level="15"
+         check_valid_geom="0">
+
+         <metadata name="TinyOWS Server"
+                   title="TinyOWS Server - Demo Service" />
+
+         <pg host="localhost" user="gis" password="mngislis" dbname="gis" port="5432" />
+
+         <layer retrievable="1"
+                writable="1"
+                server="http://geomoose.org/"
+                ns_prefix="gm"
+                ns_uri="http://geomoose.org/"
+                name="minnesota_places"
+                title="Minnesota Places" />
+</tinyows>
